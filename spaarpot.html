@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐷 Mijn Spaarpot</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ══ THEMES ══ */
+body[data-theme="candy"]  { --bg:#FFF5F9; --bg2:rgba(255,107,157,0.13); --bg3:rgba(77,166,255,0.11); --card:#fff; --text:#3D2C8D; --text2:#9B72CF; --border:#E8D5F5; --shadow:0 8px 32px rgba(61,44,141,0.12); --a1:#FF6B9D; --a2:#C77DFF; --acc:#FFD93D; --prog:#F0E6FF; --hgrad:linear-gradient(135deg,#FF6B9D,#C77DFF,#4DA6FF); }
+body[data-theme="ocean"]  { --bg:#EEF9FF; --bg2:rgba(0,180,216,0.12); --bg3:rgba(0,119,182,0.10); --card:#fff; --text:#023E8A; --text2:#0077B6; --border:#B8E0F7; --shadow:0 8px 32px rgba(0,119,182,0.12); --a1:#00B4D8; --a2:#0077B6; --acc:#48CAE4; --prog:#CAF0F8; --hgrad:linear-gradient(135deg,#00B4D8,#0077B6,#03045E); }
+body[data-theme="jungle"] { --bg:#F0FFF4; --bg2:rgba(56,161,105,0.12); --bg3:rgba(246,173,85,0.10); --card:#fff; --text:#1A4731; --text2:#2D6A4F; --border:#B7E4C7; --shadow:0 8px 32px rgba(26,71,49,0.12); --a1:#38A169; --a2:#276749; --acc:#F6AD55; --prog:#D8F3DC; --hgrad:linear-gradient(135deg,#52B788,#2D6A4F,#F6AD55); }
+body[data-theme="sunset"] { --bg:#FFF8F0; --bg2:rgba(255,107,0,0.10); --bg3:rgba(255,180,0,0.10); --card:#fff; --text:#7B2D00; --text2:#C05621; --border:#FDDCB5; --shadow:0 8px 32px rgba(123,45,0,0.12); --a1:#F6803D; --a2:#E53E3E; --acc:#FFD93D; --prog:#FEEBC8; --hgrad:linear-gradient(135deg,#FF6B35,#F6803D,#FFD93D); }
+body[data-theme="night"]  { --bg:#0F0C29; --bg2:rgba(139,92,246,0.15); --bg3:rgba(59,130,246,0.12); --card:#1E1A3F; --text:#E2D9F3; --text2:#A78BFA; --border:#3D3580; --shadow:0 8px 32px rgba(0,0,0,0.4); --a1:#8B5CF6; --a2:#3B82F6; --acc:#FBBF24; --prog:#2D2760; --hgrad:linear-gradient(135deg,#8B5CF6,#3B82F6,#06B6D4); }
+
+/* ══ BASE ══ */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 10% 20%,var(--bg2) 0%,transparent 40%),radial-gradient(circle at 90% 80%,var(--bg3) 0%,transparent 40%);min-height:100vh;color:var(--text);transition:background-color .4s,color .4s}
+
+/* ══ HEADER ══ */
+header{text-align:center;padding:28px 20px 10px;position:relative}
+header h1{font-family:'Baloo 2',cursive;font-size:clamp(1.8rem,6vw,3.2rem);font-weight:800;background:var(--hgrad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+header p{font-size:1rem;color:var(--text2);margin-top:4px;font-weight:600}
+.floating-coins{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden}
+.bg-coin{position:absolute;font-size:1.4rem;opacity:.12;animation:floatBg 8s ease-in-out infinite}
+
+/* ══ THEME BAR ══ */
+.theme-bar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px 16px 0}
+.theme-dot{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .2s,border-color .2s;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.theme-dot:hover{transform:scale(1.2)}
+.theme-dot.active{border-color:white;transform:scale(1.25);box-shadow:0 0 0 3px var(--a1)}
+
+/* ══ TOOLBAR ══ */
+.toolbar{max-width:1200px;margin:10px auto 14px;padding:0 16px;display:flex;gap:10px;justify-content:flex-end}
+.tool-btn{padding:9px 18px;border:2.5px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+.tool-btn:hover{background:var(--a1);color:white;border-color:var(--a1)}
+.tool-btn.locked{background:rgba(255,82,82,.08);border-color:#FF5252;color:#FF5252}
+.tool-btn.unlocked{background:rgba(107,203,119,.12);border-color:#6BCB77;color:#276749}
+
+/* ══ ADD SECTION ══ */
+.add-section{max-width:1200px;margin:0 auto 22px;padding:0 16px}
+.add-card{background:var(--card);border-radius:24px;padding:22px;box-shadow:var(--shadow);border:3px solid var(--acc)}
+.add-card h2{font-family:'Baloo 2',cursive;font-size:1.3rem;margin-bottom:14px;color:var(--text)}
+.add-form{display:flex;flex-wrap:wrap;gap:10px}
+.input-group{flex:1;min-width:130px}
+.input-group label{display:block;font-weight:700;font-size:.8rem;margin-bottom:5px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+input[type="text"],input[type="number"],input[type="password"]{width:100%;padding:10px 13px;border:2.5px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;color:var(--text);background:var(--card);transition:border-color .2s,box-shadow .2s;outline:none}
+input:focus{border-color:var(--a1);box-shadow:0 0 0 3px rgba(199,125,255,.2)}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:7px;margin-top:3px}
+.emoji-btn{width:42px;height:42px;border:2.5px solid var(--border);border-radius:12px;background:var(--card);font-size:1.2rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.emoji-btn:hover{transform:scale(1.1);border-color:var(--a1)}
+.emoji-btn.selected{border-color:var(--a1);background:rgba(199,125,255,.12);transform:scale(1.15)}
+.add-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--a1),var(--a2));color:white;border:none;border-radius:14px;font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(199,125,255,.3);margin-top:2px}
+.add-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(199,125,255,.45)}
+.add-btn:active{transform:translateY(0)}
+
+/* ══ GRID ══ */
+.children-grid{max-width:1200px;margin:0 auto;padding:0 16px 50px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px}
+
+/* ══ CARD ══ */
+.child-card{background:var(--card);border-radius:24px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .2s;animation:cardIn .4s cubic-bezier(.34,1.56,.64,1)}
+.child-card:hover{transform:translateY(-3px)}
+.card-accent{position:absolute;top:0;left:0;right:0;height:6px;border-radius:24px 24px 0 0}
+.card-delete{position:absolute;top:13px;right:13px;width:30px;height:30px;background:rgba(255,82,82,.1);border:none;border-radius:50%;cursor:pointer;font-size:.85rem;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.card-delete:hover{background:#FF5252;transform:scale(1.1)}
+.piggy-wrap{text-align:center;margin:10px 0 4px}
+.piggy-emoji{font-size:3.8rem;display:inline-block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.15))}
+.piggy-emoji.shake{animation:piggyShake .5s ease}
+.piggy-emoji.bounce{animation:piggyBounce .6s cubic-bezier(.34,1.56,.64,1)}
+.child-name{font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;text-align:center}
+.total-saved{text-align:center;font-size:2.1rem;font-weight:800;font-family:'Baloo 2',cursive;margin:5px 0 2px}
+.total-saved.pop{animation:amountPop .4s cubic-bezier(.34,1.56,.64,1)}
+
+/* ══ GOALS ══ */
+.goals-section{margin:10px 0 10px}
+.goal-item{margin-bottom:10px}
+.goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.goal-label{font-size:.81rem;font-weight:700;color:var(--text2)}
+.goal-pct{font-size:.77rem;font-weight:700;color:var(--text2)}
+.goal-amounts{font-size:.74rem;color:var(--text2);font-weight:600;margin-bottom:4px}
+.progress-wrap{background:var(--prog);border-radius:99px;height:15px;overflow:hidden}
+.progress-bar{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden}
+.progress-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2s infinite}
+.goal-del-btn{background:none;border:none;cursor:pointer;font-size:.75rem;opacity:.5;transition:opacity .2s;padding:2px 4px}
+.goal-del-btn:hover{opacity:1}
+.add-goal-row{display:flex;gap:6px;margin-top:8px}
+.add-goal-row input{flex:1;padding:8px 11px;font-size:.85rem;border-radius:10px}
+.add-goal-btn{padding:8px 13px;background:var(--a1);color:white;border:none;border-radius:10px;font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.add-goal-btn:hover{opacity:.85}
+
+/* ══ MONEY BUTTONS ══ */
+.money-section{margin-bottom:10px}
+.money-label{font-size:.74rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.money-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:6px}
+.money-btn{padding:11px 4px;border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.12);color:white}
+.money-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.12)}
+.money-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.btn-p50{background:linear-gradient(135deg,#FF9A3C,#FFD93D)}
+.btn-p1{background:linear-gradient(135deg,#6BCB77,#4DA6FF)}
+.btn-p2{background:linear-gradient(135deg,#4DA6FF,#C77DFF)}
+.btn-p5{background:linear-gradient(135deg,#FF6B9D,#C77DFF)}
+.btn-m50{background:linear-gradient(135deg,#FC8181,#F6AD55)}
+.btn-m1{background:linear-gradient(135deg,#FC8181,#FF6B9D)}
+.btn-m2{background:linear-gradient(135deg,#E53E3E,#FC8181)}
+.btn-m5{background:linear-gradient(135deg,#C53030,#E53E3E)}
+
+.card-actions{display:flex;gap:7px}
+.action-btn{flex:1;padding:9px 5px;border:2.5px solid var(--border);border-radius:10px;background:var(--card);font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;color:var(--text)}
+.action-btn:hover{background:var(--a1);color:white;border-color:var(--a1)}
+
+/* lock overlay */
+.card-lock-overlay{position:absolute;inset:0;border-radius:24px;background:rgba(0,0,0,.03);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;pointer-events:none}
+.lock-badge{background:rgba(0,0,0,.55);color:white;border-radius:99px;padding:5px 14px;font-size:.78rem;font-weight:700}
+
+/* goal reached */
+.goal-reached{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,217,61,.96),rgba(255,107,157,.96));display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:24px;animation:goalIn .5s cubic-bezier(.34,1.56,.64,1);z-index:10}
+.goal-reached h3{font-family:'Baloo 2',cursive;font-size:1.6rem;color:white;text-shadow:2px 2px 0 rgba(0,0,0,.15)}
+.goal-reached p{color:white;font-weight:700;font-size:.88rem;margin-top:4px}
+.goal-reached-emoji{font-size:3.5rem;animation:spin 1s ease}
+.dismiss-btn{margin-top:14px;padding:9px 22px;background:white;border:none;border-radius:99px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer;color:var(--a1);box-shadow:0 4px 12px rgba(0,0,0,.15);transition:transform .2s}
+.dismiss-btn:hover{transform:scale(1.05)}
+
+/* coin */
+.coin-particle{position:fixed;font-size:1.4rem;pointer-events:none;z-index:9999;animation:coinBurst 1s ease-out forwards}
+
+/* ══ MODAL BASE ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+.modal{background:var(--card);border-radius:24px;padding:26px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:cardIn .3s cubic-bezier(.34,1.56,.64,1);text-align:center;color:var(--text)}
+.modal h3{font-family:'Baloo 2',cursive;font-size:1.35rem;margin-bottom:12px}
+.modal-btns{display:flex;gap:10px;margin-top:12px}
+.modal-confirm{flex:1;padding:12px;background:linear-gradient(135deg,var(--a1),var(--a2));color:white;border:none;border-radius:12px;font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.modal-confirm:hover{transform:scale(1.03)}
+.modal-cancel{padding:12px 16px;background:var(--prog);color:var(--text);border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
+.modal-cancel:hover{opacity:.8}
+
+/* ══ PIN PAD ══ */
+.pin-display{display:flex;justify-content:center;gap:10px;margin:14px 0}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:3px solid var(--a1);background:transparent;transition:background .2s}
+.pin-dot.filled{background:var(--a1)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:240px;margin:0 auto}
+.pin-key{height:54px;font-family:'Baloo 2',cursive;font-size:1.35rem;font-weight:700;border:2.5px solid var(--border);border-radius:13px;background:var(--card);color:var(--text);cursor:pointer;transition:all .15s}
+.pin-key:hover{background:var(--a1);color:white;border-color:var(--a1);transform:scale(1.05)}
+.pin-key:active{transform:scale(.95)}
+.pin-error{color:#FF5252;font-size:.88rem;font-weight:700;margin-top:8px;min-height:20px}
+
+/* ══ AMOUNT MODAL ══ */
+.amount-type-toggle{display:flex;gap:8px;margin-bottom:12px}
+.type-btn{flex:1;padding:10px;border-radius:11px;border:2.5px solid var(--border);background:var(--card);font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;cursor:pointer;color:var(--text);transition:all .2s}
+.type-btn.active-plus{background:linear-gradient(135deg,#6BCB77,#4DA6FF);color:white;border-color:transparent}
+.type-btn.active-minus{background:linear-gradient(135deg,#FC8181,#FF6B9D);color:white;border-color:transparent}
+
+/* ══ SETTINGS ══ */
+.settings-section{margin-bottom:16px;text-align:left}
+.settings-section label{font-weight:700;font-size:.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.pin-change-row{display:flex;gap:7px}
+.pin-change-row input{flex:1;padding:9px 11px;font-size:1rem;letter-spacing:4px;text-align:center}
+
+/* ══ COLLAPSIBLE ADD SECTION ══ */
+.add-section{overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease, margin .3s ease}
+.add-section.collapsed{max-height:0!important;opacity:0;margin-bottom:0;pointer-events:none}
+.add-section.expanded{opacity:1}
+
+/* ══ EMPTY ══ */
+.empty-state{grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-state .empty-emoji{font-size:4.5rem;margin-bottom:12px}
+.empty-state p{font-size:1.1rem;font-weight:700}
+
+/* ══ KEYFRAMES ══ */
+@keyframes cardIn{from{opacity:0;transform:scale(.8) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes piggyShake{0%,100%{transform:rotate(0)}15%{transform:rotate(-12deg) scale(1.1)}35%{transform:rotate(10deg) scale(1.15)}55%{transform:rotate(-8deg) scale(1.1)}75%{transform:rotate(6deg)}}
+@keyframes piggyBounce{0%{transform:scale(1)}40%{transform:scale(1.3) rotate(-5deg)}60%{transform:scale(.95) rotate(3deg)}80%{transform:scale(1.1) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes amountPop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes coinBurst{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.5) rotate(var(--rot))}}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+@keyframes goalIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@keyframes spin{from{transform:rotate(0deg) scale(0)}to{transform:rotate(360deg) scale(1)}}
+@keyframes floatBg{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(10deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+</style>
+</head>
+<body data-theme="candy">
+
+<header>
+  <div class="floating-coins" id="bgCoins"></div>
+  <h1>🐷 Mijn Spaarpot!</h1>
+  <p>Spaar samen naar jouw droom ✨</p>
+</header>
+
+<div class="theme-bar" id="themeBar"></div>
+
+<div class="toolbar">
+  <button class="tool-btn locked" id="lockBtn" onclick="toggleLock()">🔒 Vergrendeld</button>
+  <button class="tool-btn" id="addToggleBtn" onclick="toggleAddSection()">➕ Kind toevoegen</button>
+  <button class="tool-btn" onclick="openSettings()">⚙️ Instellingen</button>
+</div>
+
+<div class="add-section expanded" id="addSection" style="max-height:600px">
+  <div class="add-card">
+    <h2>➕ Nieuw kind toevoegen</h2>
+    <div class="add-form">
+      <div class="input-group" style="flex-basis:100%">
+        <label>👤 Naam</label>
+        <input type="text" id="childName" placeholder="Bijv. Emma, Liam..." maxlength="20">
+      </div>
+      <div class="input-group" style="flex-basis:100%">
+        <label>🐷 Kies een spaarpot</label>
+        <div class="emoji-picker" id="emojiPicker"></div>
+      </div>
+      <div style="flex-basis:100%">
+        <button class="add-btn" onclick="addChild()">🌟 Kind toevoegen!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="children-grid" id="childrenGrid"></div>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="pinModal" style="display:none">
+  <div class="modal">
+    <h3 id="pinTitle">🔐 Pincode invoeren</h3>
+    <p id="pinSubtitle" style="font-size:.88rem;color:var(--text2);font-weight:600;min-height:18px"></p>
+    <div class="pin-display" id="pinDisplay"></div>
+    <div class="pin-pad" id="pinPad"></div>
+    <div class="pin-error" id="pinError"></div>
+    <div class="modal-btns" style="margin-top:10px">
+      <button class="modal-cancel" style="flex:1" onclick="closePinModal()">❌ Annuleer</button>
+    </div>
+  </div>
+</div>
+
+<!-- AMOUNT MODAL -->
+<div class="modal-overlay" id="amountModal" style="display:none">
+  <div class="modal">
+    <h3>💰 Bedrag aanpassen</h3>
+    <div class="amount-type-toggle">
+      <button class="type-btn active-plus" id="typePlus" onclick="setAmountType('plus')">➕ Toevoegen</button>
+      <button class="type-btn" id="typeMinus" onclick="setAmountType('minus')">➖ Afhalen</button>
+    </div>
+    <input type="number" id="customAmt" placeholder="0.00" min="0.01" step="0.01" style="width:100%;font-size:1.4rem;text-align:center;padding:12px">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeAmountModal()">❌ Annuleer</button>
+      <button class="modal-confirm" onclick="confirmAmount()">✅ Bevestigen</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" style="display:none">
+  <div class="modal" style="max-width:440px;text-align:left">
+    <h3 style="text-align:center">⚙️ Instellingen</h3>
+    <div class="settings-section">
+      <label>🔐 Pincode wijzigen</label>
+      <p style="font-size:.8rem;color:var(--text2);margin-bottom:7px">Standaard pincode is <strong>1234</strong>. Houd hem geheim voor de kinderen!</p>
+      <div class="pin-change-row">
+        <input type="password" id="oldPin" placeholder="Huidig" maxlength="4" inputmode="numeric">
+        <input type="password" id="newPin" placeholder="Nieuw" maxlength="4" inputmode="numeric">
+        <input type="password" id="newPin2" placeholder="Herhaal" maxlength="4" inputmode="numeric">
+      </div>
+      <div id="pinChangeMsg" style="font-size:.85rem;margin-top:6px;min-height:18px;font-weight:700"></div>
+      <button class="add-btn" style="margin-top:8px;font-size:.95rem;padding:10px" onclick="changePin()">💾 Pincode opslaan</button>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" style="flex:1" onclick="closeSettings()">✅ Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOJIS = ['🐷','🦊','🐻','🐼','🦁','🐸','🐨','🐙','🦄','🐬','🐧','🦋','🌈','⭐','🎀','🚀','🎸','🍦'];
+const COLORS = ['linear-gradient(135deg,#FF6B9D,#FF9A3C)','linear-gradient(135deg,#4DA6FF,#6BCB77)','linear-gradient(135deg,#C77DFF,#FF6B9D)','linear-gradient(135deg,#FFD93D,#FF6B9D)','linear-gradient(135deg,#6BCB77,#4DA6FF)','linear-gradient(135deg,#FF9A3C,#C77DFF)'];
+const THEMES = [{id:'candy',label:'🍬',bg:'linear-gradient(135deg,#FF6B9D,#C77DFF)'},{id:'ocean',label:'🌊',bg:'linear-gradient(135deg,#00B4D8,#023E8A)'},{id:'jungle',label:'🌿',bg:'linear-gradient(135deg,#52B788,#F6AD55)'},{id:'sunset',label:'🌅',bg:'linear-gradient(135deg,#FF6B35,#FFD93D)'},{id:'night',label:'🌙',bg:'linear-gradient(135deg,#8B5CF6,#06B6D4)'}];
+
+let children    = JSON.parse(localStorage.getItem('spaarpot_v2_children') || '[]');
+let appPin      = localStorage.getItem('spaarpot_pin') || '1234';
+let appTheme    = localStorage.getItem('spaarpot_theme') || 'candy';
+let isUnlocked  = false;
+let selectedEmoji = EMOJIS[0];
+let pinBuffer = '', pinMode = '', pendingAction = null;
+let amountChildId = null, amountType = 'plus';
+
+function save() {
+  localStorage.setItem('spaarpot_v2_children', JSON.stringify(children));
+  localStorage.setItem('spaarpot_pin', appPin);
+  localStorage.setItem('spaarpot_theme', appTheme);
+}
+
+/* ── INIT ── */
+function init() {
+  applyTheme(appTheme, true);
+  buildThemeBar();
+  buildEmojiPicker();
+  buildBgCoins();
+  render();
+  // restore add-section state
+  const addOpen = localStorage.getItem('spaarpot_addOpen');
+  if (addOpen === '0') {
+    const sec = document.getElementById('addSection');
+    const btn = document.getElementById('addToggleBtn');
+    sec.classList.remove('expanded'); sec.classList.add('collapsed');
+    btn.textContent = '➕ Kind toevoegen';
+  } else {
+    document.getElementById('addToggleBtn').textContent = '🔼 Verbergen';
+  }
+}
+
+function applyTheme(t, silent) {
+  appTheme = t;
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === t));
+  if (!silent) save();
+}
+
+function buildThemeBar() {
+  const bar = document.getElementById('themeBar');
+  THEMES.forEach(th => {
+    const b = document.createElement('button');
+    b.className = 'theme-dot' + (th.id === appTheme ? ' active' : '');
+    b.dataset.theme = th.id;
+    b.title = th.id.charAt(0).toUpperCase()+th.id.slice(1);
+    b.textContent = th.label;
+    b.style.background = th.bg;
+    b.onclick = () => applyTheme(th.id);
+    bar.appendChild(b);
+  });
+}
+
+function buildEmojiPicker() {
+  const p = document.getElementById('emojiPicker');
+  EMOJIS.forEach((e, i) => {
+    const b = document.createElement('button');
+    b.className = 'emoji-btn' + (i === 0 ? ' selected' : '');
+    b.textContent = e;
+    b.onclick = () => { document.querySelectorAll('.emoji-btn').forEach(x => x.classList.remove('selected')); b.classList.add('selected'); selectedEmoji = e; };
+    p.appendChild(b);
+  });
+}
+
+function buildBgCoins() {
+  const bg = document.getElementById('bgCoins');
+  ['🪙','💰','⭐','✨','🌟'].forEach((e, i) => {
+    const el = document.createElement('span');
+    el.className = 'bg-coin';
+    el.textContent = e;
+    el.style.cssText = `left:${10+i*20}%;top:${15+i*14}%;animation-delay:${i*1.4}s;animation-duration:${7+i*1.2}s`;
+    bg.appendChild(el);
+  });
+}
+
+/* ── RENDER ── */
+function render() {
+  updateLockBtn();
+  const grid = document.getElementById('childrenGrid');
+  grid.innerHTML = '';
+  if (!children.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-emoji">🐷</div><p>Voeg een kind toe om te beginnen!</p></div>';
+    return;
+  }
+  children.forEach((child, idx) => {
+    const col = COLORS[idx % COLORS.length];
+    const reachedGoal = child.goals && child.goals.find(g => g.amount > 0 && child.saved >= g.amount && !g.dismissed);
+    const card = document.createElement('div');
+    card.className = 'child-card';
+    card.id = `card-${child.id}`;
+
+    let goalsHTML = '';
+    if (child.goals && child.goals.length) {
+      goalsHTML = child.goals.map((g, gi) => {
+        const pct = g.amount > 0 ? Math.min((child.saved / g.amount) * 100, 100) : 0;
+        const rem = Math.max(0, g.amount - child.saved);
+        return `<div class="goal-item">
+          <div class="goal-header">
+            <span class="goal-label">🎯 ${esc(g.label)} — €${g.amount.toFixed(2)}</span>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="goal-pct">${Math.round(pct)}%</span>
+              ${isUnlocked ? `<button class="goal-del-btn" onclick="deleteGoal('${child.id}',${gi})">✖</button>` : ''}
+            </div>
+          </div>
+          <div class="goal-amounts">Gespaard: €${child.saved.toFixed(2)} &nbsp;·&nbsp; Nog: €${rem.toFixed(2)}</div>
+          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${col}"></div></div>
+        </div>`;
+      }).join('');
+    }
+
+    const addGoalRow = isUnlocked ? `<div class="add-goal-row">
+      <input type="text" id="gl-${child.id}" placeholder="Omschrijving" maxlength="30">
+      <input type="number" id="ga-${child.id}" placeholder="€" min="0.50" step="0.50" style="max-width:76px">
+      <button class="add-goal-btn" onclick="addGoal('${child.id}')">+ Doel</button>
+    </div>` : '';
+
+    card.innerHTML = `
+      <div class="card-accent" style="background:${col}"></div>
+      ${isUnlocked ? `<button class="card-delete" onclick="deleteChild('${child.id}')">🗑️</button>` : ''}
+      <div class="piggy-wrap"><span class="piggy-emoji" id="piggy-${child.id}">${child.emoji}</span></div>
+      <div class="child-name">${esc(child.name)}</div>
+      <div class="total-saved" id="amount-${child.id}" style="-webkit-text-fill-color:transparent;background:${col};-webkit-background-clip:text;background-clip:text;">€${child.saved.toFixed(2)}</div>
+      <div class="goals-section">${goalsHTML}${addGoalRow}</div>
+      <div class="money-section">
+        <div class="money-label">➕ Geld toevoegen</div>
+        <div class="money-buttons">
+          <button class="money-btn btn-p50" onclick="reqMoney('${child.id}',.50,'plus')">+€0,50</button>
+          <button class="money-btn btn-p1"  onclick="reqMoney('${child.id}',1,'plus')">+€1</button>
+          <button class="money-btn btn-p2"  onclick="reqMoney('${child.id}',2,'plus')">+€2</button>
+          <button class="money-btn btn-p5"  onclick="reqMoney('${child.id}',5,'plus')">+€5</button>
+        </div>
+        <div class="money-label" style="margin-top:5px">➖ Geld afhalen</div>
+        <div class="money-buttons">
+          <button class="money-btn btn-m50" onclick="reqMoney('${child.id}',.50,'minus')">-€0,50</button>
+          <button class="money-btn btn-m1"  onclick="reqMoney('${child.id}',1,'minus')">-€1</button>
+          <button class="money-btn btn-m2"  onclick="reqMoney('${child.id}',2,'minus')">-€2</button>
+          <button class="money-btn btn-m5"  onclick="reqMoney('${child.id}',5,'minus')">-€5</button>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn" onclick="openAmountModal('${child.id}')">✏️ Eigen bedrag</button>
+        ${isUnlocked ? `<button class="action-btn" onclick="resetChild('${child.id}')">🔄 Reset</button>` : ''}
+      </div>
+      ${!isUnlocked ? `<div class="card-lock-overlay"><div class="lock-badge">🔒 Pincode vereist</div></div>` : ''}
+      ${reachedGoal ? `<div class="goal-reached"><span class="goal-reached-emoji">🏆</span><h3>Gelukt!! 🎉</h3><p>"${esc(reachedGoal.label)}" bereikt!</p><button class="dismiss-btn" onclick="dismissGoal('${child.id}',${child.goals.indexOf(reachedGoal)})">Doorgaan! 🚀</button></div>` : ''}
+    `;
+    grid.appendChild(card);
+    if (reachedGoal) playSound('fanfare');
+  });
+}
+
+function updateLockBtn() {
+  const b = document.getElementById('lockBtn');
+  b.textContent = isUnlocked ? '🔓 Ontgrendeld' : '🔒 Vergrendeld';
+  b.className = 'tool-btn ' + (isUnlocked ? 'unlocked' : 'locked');
+}
+
+/* ── TOGGLE ADD SECTION ── */
+function toggleAddSection() {
+  const doToggle = () => {
+    const sec = document.getElementById('addSection');
+    const btn = document.getElementById('addToggleBtn');
+    const isOpen = sec.classList.contains('expanded');
+    if (isOpen) {
+      sec.style.maxHeight = sec.scrollHeight + 'px';
+      requestAnimationFrame(() => { sec.classList.remove('expanded'); sec.classList.add('collapsed'); btn.textContent = '➕ Kind toevoegen'; });
+    } else {
+      sec.classList.remove('collapsed'); sec.classList.add('expanded');
+      sec.style.maxHeight = '600px';
+      btn.textContent = '🔼 Verbergen';
+    }
+    localStorage.setItem('spaarpot_addOpen', isOpen ? '0' : '1');
+  };
+  if (!isUnlocked) { openPinModal('unlock', () => { isUnlocked = true; render(); doToggle(); }); }
+  else doToggle();
+}
+
+/* ── ADD CHILD ── */
+function addChild() {
+  const name = document.getElementById('childName').value.trim();
+  if (!name) { shakeEl('childName'); return; }
+  children.push({ id: Date.now().toString(), name, emoji: selectedEmoji, saved: 0, goals: [] });
+  save(); render();
+  document.getElementById('childName').value = '';
+  playSound('add');
+}
+
+/* ── GOALS ── */
+function addGoal(id) {
+  const child = children.find(c => c.id === id);
+  if (!child) return;
+  const labelEl = document.getElementById(`gl-${id}`);
+  const amtEl   = document.getElementById(`ga-${id}`);
+  const label   = labelEl?.value.trim() || '';
+  const amount  = parseFloat(amtEl?.value) || 0;
+  if (!label) { shakeEl(`gl-${id}`); return; }
+  if (amount <= 0) { shakeEl(`ga-${id}`); return; }
+  child.goals.push({ label, amount, dismissed: false });
+  save(); render();
+}
+function deleteGoal(cid, gi) {
+  const c = children.find(x => x.id === cid);
+  if (c) { c.goals.splice(gi, 1); save(); render(); }
+}
+function dismissGoal(cid, gi) {
+  const c = children.find(x => x.id === cid);
+  if (c && c.goals[gi]) { c.goals[gi].dismissed = true; save(); render(); }
+}
+
+/* ── MONEY ── */
+function reqMoney(id, amount, type) {
+  if (isUnlocked) {
+    applyMoney(id, amount, type);
+  } else {
+    openPinModal('unlock', () => {
+      isUnlocked = true;   // set BEFORE applyMoney (which calls render)
+      applyMoney(id, amount, type);
+    });
+  }
+}
+function applyMoney(id, amount, type) {
+  const child = children.find(c => c.id === id);
+  if (!child) return;
+  const delta = type === 'minus' ? -amount : amount;
+  child.saved = Math.max(0, Math.round((child.saved + delta) * 100) / 100);
+  if (child.goals) child.goals.forEach(g => { if (child.saved < g.amount) g.dismissed = false; });
+  save(); render();
+  const piggy = document.getElementById(`piggy-${id}`);
+  if (piggy) { piggy.classList.remove('bounce','shake'); void piggy.offsetWidth; piggy.classList.add(Math.abs(amount) >= 2 ? 'bounce' : 'shake'); }
+  const amtEl = document.getElementById(`amount-${id}`);
+  if (amtEl) { amtEl.classList.remove('pop'); void amtEl.offsetWidth; amtEl.classList.add('pop'); }
+  if (type === 'plus') { spawnCoins(id, amount); playSound('coin'); } else playSound('minus');
+}
+
+/* ── AMOUNT MODAL ── */
+function openAmountModal(id) {
+  // If locked, verify PIN first — then open the modal
+  if (!isUnlocked) {
+    openPinModal('unlock', () => {
+      isUnlocked = true;
+      _showAmountModal(id);
+    });
+    return;
+  }
+  _showAmountModal(id);
+}
+function _showAmountModal(id) {
+  amountChildId = id; amountType = 'plus';
+  document.getElementById('customAmt').value = '';
+  document.getElementById('typePlus').className  = 'type-btn active-plus';
+  document.getElementById('typeMinus').className = 'type-btn';
+  document.getElementById('amountModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('customAmt').focus(), 80);
+}
+function closeAmountModal() { document.getElementById('amountModal').style.display = 'none'; amountChildId = null; }
+function setAmountType(t) {
+  amountType = t;
+  document.getElementById('typePlus').className  = t==='plus'  ? 'type-btn active-plus'  : 'type-btn';
+  document.getElementById('typeMinus').className = t==='minus' ? 'type-btn active-minus' : 'type-btn';
+}
+function confirmAmount() {
+  const val = parseFloat(document.getElementById('customAmt').value);
+  if (!val || val <= 0) { shakeEl('customAmt'); return; }
+  const id = amountChildId;
+  const type = amountType;
+  closeAmountModal();
+  applyMoney(id, val, type); // PIN already verified, call applyMoney directly
+}
+document.getElementById('amountModal').addEventListener('click', e => { if (e.target===document.getElementById('amountModal')) closeAmountModal(); });
+document.getElementById('customAmt').addEventListener('keydown', e => { if (e.key==='Enter') confirmAmount(); if (e.key==='Escape') closeAmountModal(); });
+
+/* ── DELETE / RESET ── */
+function deleteChild(id) {
+  if (!confirm('Spaarpot verwijderen? 🗑️')) return;
+  children = children.filter(c => c.id !== id); save(); render();
+}
+function resetChild(id) {
+  if (!confirm('Reset naar €0,00? 🔄')) return;
+  const c = children.find(x => x.id === id);
+  if (c) { c.saved = 0; c.goals?.forEach(g => g.dismissed = false); }
+  save(); render();
+}
+
+/* ── LOCK / UNLOCK ── */
+function toggleLock() {
+  if (isUnlocked) { isUnlocked = false; render(); }
+  else openPinModal('unlock', () => { isUnlocked = true; render(); });
+}
+
+/* ── PIN MODAL ── */
+function openPinModal(mode, onSuccess) {
+  pinMode = mode; pinBuffer = ''; pendingAction = onSuccess || null;
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinTitle').textContent = '🔐 Pincode invoeren';
+  document.getElementById('pinSubtitle').textContent = 'Voer je 4-cijferige pincode in';
+  buildPinPad(); renderPinDots();
+  document.getElementById('pinModal').style.display = 'flex';
+}
+function closePinModal() { document.getElementById('pinModal').style.display = 'none'; pinBuffer = ''; pendingAction = null; }
+function buildPinPad() {
+  const pad = document.getElementById('pinPad');
+  pad.innerHTML = '';
+  [1,2,3,4,5,6,7,8,9].forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'pin-key'; b.textContent = n;
+    b.onclick = () => pinPress(String(n)); pad.appendChild(b);
+  });
+  const blank = document.createElement('button');
+  blank.className = 'pin-key'; blank.style.visibility = 'hidden'; pad.appendChild(blank);
+  const z = document.createElement('button');
+  z.className = 'pin-key'; z.textContent = '0'; z.onclick = () => pinPress('0'); pad.appendChild(z);
+  const bk = document.createElement('button');
+  bk.className = 'pin-key'; bk.textContent = '⌫';
+  bk.onclick = () => { pinBuffer = pinBuffer.slice(0,-1); renderPinDots(); }; pad.appendChild(bk);
+}
+function renderPinDots() {
+  const d = document.getElementById('pinDisplay');
+  d.innerHTML = '';
+  for (let i=0;i<4;i++) { const dot=document.createElement('div'); dot.className='pin-dot'+(i<pinBuffer.length?' filled':''); d.appendChild(dot); }
+}
+function pinPress(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit; renderPinDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+function checkPin() {
+  if (pinBuffer === appPin) { const action = pendingAction; closePinModal(); if (action) action(); }
+  else {
+    document.getElementById('pinError').textContent = '❌ Verkeerde pincode! Probeer opnieuw.';
+    const d = document.getElementById('pinDisplay');
+    d.style.animation='none'; void d.offsetWidth; d.style.animation='shake .4s ease';
+    setTimeout(() => { pinBuffer=''; renderPinDots(); document.getElementById('pinError').textContent=''; }, 700);
+  }
+}
+
+/* ── SETTINGS ── */
+function openSettings() {
+  if (!isUnlocked) { openPinModal('unlock', () => { isUnlocked=true; render(); openSettings(); }); return; }
+  ['oldPin','newPin','newPin2'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('pinChangeMsg').textContent = '';
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+function closeSettings() { document.getElementById('settingsModal').style.display='none'; }
+function changePin() {
+  const old = document.getElementById('oldPin').value;
+  const nw  = document.getElementById('newPin').value;
+  const nw2 = document.getElementById('newPin2').value;
+  const msg = document.getElementById('pinChangeMsg');
+  if (old !== appPin)       { msg.style.color='#FF5252'; msg.textContent='❌ Huidige pincode klopt niet.'; return; }
+  if (!/^\d{4}$/.test(nw)) { msg.style.color='#FF5252'; msg.textContent='❌ Nieuwe pincode moet 4 cijfers zijn.'; return; }
+  if (nw !== nw2)           { msg.style.color='#FF5252'; msg.textContent='❌ Pincodes komen niet overeen.'; return; }
+  appPin = nw; save();
+  msg.style.color='#6BCB77'; msg.textContent='✅ Pincode succesvol gewijzigd!';
+  setTimeout(() => { ['oldPin','newPin','newPin2'].forEach(id=>document.getElementById(id).value=''); msg.textContent=''; }, 2000);
+}
+document.getElementById('settingsModal').addEventListener('click', e => { if (e.target===document.getElementById('settingsModal')) closeSettings(); });
+
+/* ── COINS ── */
+function spawnCoins(id, amount) {
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  const count = amount>=5?12:amount>=2?8:5;
+  for (let i=0;i<count;i++) {
+    const el=document.createElement('span'); el.className='coin-particle';
+    el.textContent=['🪙','⭐','✨','💰'][Math.floor(Math.random()*4)];
+    const angle=(Math.PI*2*i/count)+(Math.random()-.5)*.5, dist=80+Math.random()*80;
+    el.style.cssText=`left:${cx}px;top:${cy}px;--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${Math.random()*360}deg;animation-delay:${Math.random()*.1}s`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
+  }
+}
+
+/* ── SOUND ── */
+function playSound(type) {
+  try {
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if (type==='fanfare') {
+      [523,659,784,1047].forEach((f,i)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='triangle'; o.frequency.value=f; g.gain.setValueAtTime(.25,ctx.currentTime+i*.1); g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+i*.1+.25); o.start(ctx.currentTime+i*.1); o.stop(ctx.currentTime+i*.1+.3); });
+      return;
+    }
+    const osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type==='coin') { osc.type='triangle'; osc.frequency.setValueAtTime(880,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(1760,ctx.currentTime+.15); gain.gain.setValueAtTime(.3,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3); }
+    else if (type==='minus') { osc.type='sawtooth'; osc.frequency.setValueAtTime(440,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(220,ctx.currentTime+.2); gain.gain.setValueAtTime(.2,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3); }
+    else { osc.type='sine'; [440,550,660].forEach((f,i)=>osc.frequency.setValueAtTime(f,ctx.currentTime+i*.1)); gain.gain.setValueAtTime(.2,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.4); }
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime+.4);
+  } catch(e) {}
+}
+
+/* ── HELPERS ── */
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function shakeEl(id) {
+  const el=document.getElementById(id); if(!el) return;
+  el.style.animation='none'; void el.offsetWidth; el.style.animation='shake .4s ease'; el.style.borderColor='#FF5252';
+  setTimeout(()=>{el.style.borderColor='';el.style.animation='';},600);
+}
+
+// Note: auto-lock removed — it interfered with PIN modal on some browsers
+
+init();
+</script>
+</body>
+</html>
